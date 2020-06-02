@@ -310,8 +310,8 @@ def visualCoverage(patch, altMap, aziMap, pixelSize=2., closeIter=None, isPlot=F
 
     pixelSize = np.float(pixelSize)
 
-    altRange = np.array([-40., 60.])
-    aziRange = np.array([-20., 120.])
+    altRange = np.array([self.params['lmin_alt'], self.params['lmax_alt']]) #np.array([-40., 60.])
+    aziRange = np.array([self.params['lmin_azi'], self.params['lmax_azi']]) #np.array([-20., 120.])
 
     gridAzi, gridAlt = np.meshgrid(np.arange(aziRange[0], aziRange[1], pixelSize),
                                    np.arange(altRange[0], altRange[1], pixelSize))
@@ -873,16 +873,26 @@ def plotPatchBorders3(patches, altPosMap, aziPosMap, plotAxis=None, plotSize=Non
     plotAxis.get_yaxis().set_visible(False)
 
 
-def plotPairedPatches(patch1, patch2, altMap, aziMap, title, pixelSize=1, closeIter=None):
+def plotPairedPatches(patch1, patch2, altMap, aziMap, title, pixelSize=1, closeIter=None,
+                        lmin_alt=-20, lmax_alt=60, lmin_azi=0, lmax_azi=120):
     visualSpace1, area1, _, _ = patch1.getVisualSpace(altMap=altMap,
                                                       aziMap=aziMap,
                                                       pixelSize=pixelSize,
-                                                      closeIter=closeIter)
+                                                      closeIter=closeIter,
+                                                      lmin_alt=lmin_alt,
+                                                      lmax_alt=lmax_alt,
+                                                      lmin_azi=lmin_azi,
+                                                      lmax_azi=lmax_azi)
 
     visualSpace2, area2, _, _ = patch2.getVisualSpace(altMap=altMap,
                                                       aziMap=aziMap,
                                                       pixelSize=pixelSize,
-                                                      closeIter=closeIter)
+                                                      closeIter=closeIter,
+                                                      lmin_alt=lmin_alt,
+                                                      lmax_alt=lmax_alt,
+                                                      lmin_azi=lmin_azi,
+                                                      lmax_azi=lmax_azi)
+
 
     visualSpace1 = np.array(visualSpace1, dtype=np.float32)
     visualSpace2 = np.array(visualSpace2, dtype=np.float32)
@@ -966,10 +976,14 @@ class RetinotopicMappingTrial(object):
                      'smallPatchThr': 100,
                      'visualSpacePixelSize': 0.5,
                      'visualSpaceCloseIter': 15,
-                     'splitOverlapThr': 1.1
+                     'splitOverlapThr': 1.1,
+                     'lmin_alt':-20, 
+                     'lmax_alt':60,
+                     'lmin_azi':0,
+                     'lmax_azi':120
                  },
                  ):
-
+  
         self.mouseID = mouseID
         self.dateRecorded = dateRecorded
         self.altPosMap = altPosMap
@@ -979,6 +993,8 @@ class RetinotopicMappingTrial(object):
         self.vasculatureMap = vasculatureMap
         self.comments = comments
         self.params = params
+        #self.lmin_alt, self.lmax_alt = (lmin_alt, lmax_alt)
+        #self.lmin_azi, self.lmax_azi = (lmin_azi, lmax_azi)
 
     def getName(self):
 
@@ -1020,7 +1036,7 @@ class RetinotopicMappingTrial(object):
             f1 = plt.figure(figsize=(18, 9))
             f1_231 = f1.add_subplot(231)
             if isFixedRange:
-                currfig = f1_231.imshow(self.altPosMap, vmin=-40, vmax=60, cmap='hsv', interpolation='nearest')
+                currfig = f1_231.imshow(self.altPosMap, vmin=self.params['lmin_alt'], vmax=self.params['lmax_alt'], cmap='hsv', interpolation='nearest')
             else:
                 currfig = f1_231.imshow(self.altPosMap, cmap='hsv', interpolation='nearest')
             f1.colorbar(currfig)
@@ -1028,7 +1044,7 @@ class RetinotopicMappingTrial(object):
             f1_231.set_title('alt position')
             f1_232 = f1.add_subplot(232)
             if isFixedRange:
-                currfig = f1_232.imshow(self.aziPosMap, vmin=-0, vmax=120, cmap='hsv', interpolation='nearest')
+                currfig = f1_232.imshow(self.aziPosMap, vmin=self.params['lmin_azi'], vmax=self.params['lmax_azi'], cmap='hsv', interpolation='nearest')
             else:
                 currfig = f1_232.imshow(self.aziPosMap, cmap='hsv', interpolation='nearest')
             f1.colorbar(currfig)
@@ -1041,7 +1057,7 @@ class RetinotopicMappingTrial(object):
             f1_233.set_title('sign map')
             f1_234 = f1.add_subplot(234)
             if isFixedRange:
-                currfig = f1_234.imshow(altPosMapf, vmin=-40, vmax=60, cmap='hsv', interpolation='nearest')
+                currfig = f1_234.imshow(altPosMapf, vmin=self.params['lmin_alt'], vmax=self.params['lmax_alt'], cmap='hsv', interpolation='nearest')
             else:
                 currfig = f1_234.imshow(altPosMapf, cmap='hsv', interpolation='nearest')
             f1.colorbar(currfig)
@@ -1049,7 +1065,7 @@ class RetinotopicMappingTrial(object):
             f1_234.set_title('alt position filtered')
             f1_235 = f1.add_subplot(235)
             if isFixedRange:
-                currfig = f1_235.imshow(aziPosMapf, vmin=0, vmax=120, cmap='hsv', interpolation='nearest')
+                currfig = f1_235.imshow(aziPosMapf, vmin=self.params['lmin_azi'], vmax=self.params['lmax_azi'], cmap='hsv', interpolation='nearest')
             else:
                 currfig = f1_235.imshow(aziPosMapf, cmap='hsv', interpolation='nearest')
             f1.colorbar(currfig)
@@ -1325,8 +1341,10 @@ class RetinotopicMappingTrial(object):
                             f122.imshow(currVisualSpace, interpolation='nearest', alpha=0.5, vmin=0,
                                         vmax=len(newPatches.keys()))
 
-                        xlabel = np.arange(-20, 120, visualSpacePixelSize)
-                        ylabel = np.arange(60, -40, -visualSpacePixelSize)
+                        xlabel = np.arange(self.params['lmin_azi'], self.params['lmax_azi'], visualSpacePixelSize)
+                        ylabel = np.arange(self.params['lmax_alt'], self.params['lmin_alt'], -visualSpacePixelSize)
+                        # xlabel = np.arange(-20, 120, visualSpacePixelSize)
+                        # ylabel = np.arange(60, -40, -visualSpacePixelSize)
 
                         indSpace = int(10. / visualSpacePixelSize)
 
@@ -1928,12 +1946,12 @@ class RetinotopicMappingTrial(object):
         f1 = plt.figure(figsize=(18, 9))
         f1.suptitle(trialName)
         f1_231 = f1.add_subplot(231)
-        currfig = f1_231.imshow(self.altPosMapf, vmin=-40, vmax=60, cmap='hsv', interpolation='nearest')
+        currfig = f1_231.imshow(self.altPosMapf, vmin=self.params['lmin_alt'], vmax=self.params['lmax_alt'], cmap='hsv', interpolation='nearest')
         f1.colorbar(currfig)
         f1_231.set_axis_off()
         f1_231.set_title('alt position')
         f1_232 = f1.add_subplot(232)
-        currfig = f1_232.imshow(self.aziPosMapf, vmin=0, vmax=120, cmap='hsv', interpolation='nearest')
+        currfig = f1_232.imshow(self.aziPosMapf, vmin=self.params['lmin_azi'], vmax=self.params['lmax_azi'], cmap='hsv', interpolation='nearest')
         f1.colorbar(currfig)
         f1_232.set_axis_off()
         f1_232.set_title('azi position')
@@ -1967,7 +1985,8 @@ class RetinotopicMappingTrial(object):
         f2.suptitle(trialName)
         f2_221 = f2.add_subplot(221)
         for key, value in self.rawPatches.iteritems():
-            currfig = f2_221.imshow(self.altPosMapf * value.getMask(), vmin=-40, vmax=60, interpolation='nearest')
+            # currfig = f2_221.imshow(self.altPosMapf * value.getMask(), vmin=-40, vmax=60, interpolation='nearest')
+            currfig = f2_221.imshow(self.altPosMapf * value.getMask(), vmin=self.params['lmin_alt'], vmax=self.params['lmax_alt'], interpolation='nearest')
         f2.colorbar(currfig)
         plt.tick_params(
             axis='both',  # changes apply to the x-axis
@@ -1982,7 +2001,7 @@ class RetinotopicMappingTrial(object):
 
         f2_222 = f2.add_subplot(222)
         for key, value in self.rawPatches.iteritems():
-            currfig = f2_222.imshow(self.aziPosMapf * value.getMask(), vmin=-10, vmax=120, interpolation='nearest')
+            currfig = f2_222.imshow(self.aziPosMapf * value.getMask(), vmin=self.params['lmin_azi'], vmax=self.params['lmax_azi'], interpolation='nearest')
         f2.colorbar(currfig)
         plt.tick_params(
             axis='both',  # changes apply to the x-axis
@@ -2081,7 +2100,7 @@ class RetinotopicMappingTrial(object):
         plotAxis.set_title(name)
 
     def plotFinalPatchBorders(self, plotAxis=None, plotName=True, plotVasMap=True, isTitle=True, isColor=True,
-                              borderWidth=2, fontSize=15, interpolation='bilinear'):
+                              borderWidth=2, fontSize=16, interpolation='bilinear'):
 
         if hasattr(self, 'finalPatchesMarked'):
             finalPatches = self.finalPatchesMarked
@@ -2742,7 +2761,7 @@ class Patch(object):
         else:
             return False
 
-    def getVisualSpace(self, altMap, aziMap, visualFieldOrigin=None, pixelSize=1., closeIter=None, isplot=False):
+    def getVisualSpace(self, altMap, aziMap, visualFieldOrigin=None, pixelSize=1., closeIter=None, isplot=False, lmin_alt=-20, lmax_alt=60, lmin_azi=0, lmax_azi=120):
         """
         get the visual response space, visual response space center unique area and
         eccentricity map of a cortical patch
@@ -2753,8 +2772,8 @@ class Patch(object):
 
         pixelSize = np.float(pixelSize)
 
-        altRange = np.array([-40., 60.])
-        aziRange = np.array([-20., 120.])
+        altRange = np.array([lmin_alt-10, lmax_alt+10]) #np.array([-40., 60.])
+        aziRange = np.array([lmin_azi-10, lmax_azi+10]) #-20., 120.])
 
         if visualFieldOrigin:
             altMap = altMap - visualFieldOrigin[0]
