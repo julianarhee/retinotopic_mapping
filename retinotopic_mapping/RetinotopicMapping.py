@@ -1006,7 +1006,7 @@ class RetinotopicMappingTrial(object):
     def __str__(self):
         return 'A retinotopic mapping trial: ' + self.getName()
 
-    def _getSignMap(self, isReverse=False, isPlot=False, isFixedRange=True):
+    def _getSignMap(self, isReverse=False, isPlot=False, isFixedRange=True, cmap='hsv'):
 
         altPosMapf = ni.filters.gaussian_filter(self.altPosMap,
                                                 self.params['phaseMapFilterSigma'])
@@ -1036,17 +1036,17 @@ class RetinotopicMappingTrial(object):
             f1 = plt.figure(figsize=(18, 9))
             f1_231 = f1.add_subplot(231)
             if isFixedRange:
-                currfig = f1_231.imshow(self.altPosMap, vmin=self.params['lmin_alt'], vmax=self.params['lmax_alt'], cmap='hsv', interpolation='nearest')
+                currfig = f1_231.imshow(self.altPosMap, vmin=self.params['lmin_alt'], vmax=self.params['lmax_alt'], cmap=cmap, interpolation='nearest')
             else:
-                currfig = f1_231.imshow(self.altPosMap, cmap='hsv', interpolation='nearest')
+                currfig = f1_231.imshow(self.altPosMap, cmap=cmap, interpolation='nearest')
             f1.colorbar(currfig)
             f1_231.set_axis_off()
             f1_231.set_title('alt position')
             f1_232 = f1.add_subplot(232)
             if isFixedRange:
-                currfig = f1_232.imshow(self.aziPosMap, vmin=self.params['lmin_azi'], vmax=self.params['lmax_azi'], cmap='hsv', interpolation='nearest')
+                currfig = f1_232.imshow(self.aziPosMap, vmin=self.params['lmin_azi'], vmax=self.params['lmax_azi'], cmap=cmap, interpolation='nearest')
             else:
-                currfig = f1_232.imshow(self.aziPosMap, cmap='hsv', interpolation='nearest')
+                currfig = f1_232.imshow(self.aziPosMap, cmap=cmap, interpolation='nearest')
             f1.colorbar(currfig)
             f1_232.set_axis_off()
             f1_232.set_title('azi position')
@@ -1057,17 +1057,17 @@ class RetinotopicMappingTrial(object):
             f1_233.set_title('sign map')
             f1_234 = f1.add_subplot(234)
             if isFixedRange:
-                currfig = f1_234.imshow(altPosMapf, vmin=self.params['lmin_alt'], vmax=self.params['lmax_alt'], cmap='hsv', interpolation='nearest')
+                currfig = f1_234.imshow(altPosMapf, vmin=self.params['lmin_alt'], vmax=self.params['lmax_alt'], cmap=cmap, interpolation='nearest')
             else:
-                currfig = f1_234.imshow(altPosMapf, cmap='hsv', interpolation='nearest')
+                currfig = f1_234.imshow(altPosMapf, cmap=cmap, interpolation='nearest')
             f1.colorbar(currfig)
             f1_234.set_axis_off()
             f1_234.set_title('alt position filtered')
             f1_235 = f1.add_subplot(235)
             if isFixedRange:
-                currfig = f1_235.imshow(aziPosMapf, vmin=self.params['lmin_azi'], vmax=self.params['lmax_azi'], cmap='hsv', interpolation='nearest')
+                currfig = f1_235.imshow(aziPosMapf, vmin=self.params['lmin_azi'], vmax=self.params['lmax_azi'], cmap=cmap, interpolation='nearest')
             else:
-                currfig = f1_235.imshow(aziPosMapf, cmap='hsv', interpolation='nearest')
+                currfig = f1_235.imshow(aziPosMapf, cmap=cmap, interpolation='nearest')
             f1.colorbar(currfig)
             plt.axis('off')
             f1_235.set_title('azi position filtered')
@@ -1102,10 +1102,10 @@ class RetinotopicMappingTrial(object):
 
         return altPosMapf, aziPosMapf, altPowerMapf, aziPowerMapf, signMap, signMapf
 
-    def _getRawPatchMap(self, isPlot=False):
+    def _getRawPatchMap(self, isPlot=False, cmap='hsv'):
 
         if not hasattr(self, 'signMapf'):
-            _ = self._getSignMap()
+            _ = self._getSignMap(cmap=cmap)
 
         signMapf = self.signMapf
         signMapThr = self.params['signMapThr']
@@ -1139,10 +1139,10 @@ class RetinotopicMappingTrial(object):
 
         return patchmap2
 
-    def _getRawPatches(self, isPlot=False):
+    def _getRawPatches(self, isPlot=False, cmap='hsv'):
 
         if not hasattr(self, 'rawPatchMap'):
-            _ = self._getRawPatchMap()
+            _ = self._getRawPatchMap(cmap=cmap)
 
         signMapf = self.signMapf
         rawPatchMap = self.rawPatchMap
@@ -1197,10 +1197,10 @@ class RetinotopicMappingTrial(object):
 
         return rawPatches
 
-    def _getDeterminantMap(self, isPlot=False):
+    def _getDeterminantMap(self, isPlot=False, cmap='hsv'):
 
         if not hasattr(self, 'altPosMapf') or not hasattr(self, 'aziPosMapf'):
-            _ = self._getSignMap()
+            _ = self._getSignMap(cmap=cmap)
 
         altPosMapf = self.altPosMapf
         aziPosMapf = self.aziPosMapf
@@ -1216,7 +1216,7 @@ class RetinotopicMappingTrial(object):
 
         if isPlot:
             plt.figure()
-            plt.imshow(detMap, vmin=0, vmax=1, cmap='hsv', interpolation='nearest')
+            plt.imshow(detMap, vmin=0, vmax=1, cmap=cmap, interpolation='nearest')
             plt.colorbar()
             plt.title('determinant map')
             plt.gca().set_axis_off()
@@ -1225,10 +1225,10 @@ class RetinotopicMappingTrial(object):
 
         return detMap
 
-    def _getEccentricityMap(self, isPlot=False):
+    def _getEccentricityMap(self, isPlot=False, cmap='hsv'):
 
         if not hasattr(self, 'rawPatches'):
-            _ = self._getRawPatches()
+            _ = self._getRawPatches(cmap=cmap)
 
         altPosMapf = self.altPosMapf
         aziPosMapf = self.aziPosMapf
@@ -1620,17 +1620,17 @@ class RetinotopicMappingTrial(object):
         except AttributeError:
             pass
 
-    def processTrial(self, isPlot=False):
+    def processTrial(self, isPlot=False, cmap='hsv'):
         self.cleanMaps()
-        _ = self._getSignMap(isPlot=isPlot)
+        _ = self._getSignMap(isPlot=isPlot, cmap=cmap)
         if isPlot: plt.show()
-        _ = self._getRawPatchMap(isPlot=isPlot)
+        _ = self._getRawPatchMap(isPlot=isPlot, cmap=cmap)
         if isPlot: plt.show()
-        _ = self._getRawPatches(isPlot=isPlot)
+        _ = self._getRawPatches(isPlot=isPlot, cmap=cmap)
         if isPlot: plt.show()
-        _ = self._getDeterminantMap(isPlot=isPlot)
+        _ = self._getDeterminantMap(isPlot=isPlot, cmap=cmap)
         if isPlot: plt.show()
-        _ = self._getEccentricityMap(isPlot=isPlot)
+        _ = self._getEccentricityMap(isPlot=isPlot, cmap=cmap)
         if isPlot: plt.show()
         _ = self._splitPatches(isPlot=isPlot)
         if isPlot: plt.show()
@@ -1676,10 +1676,10 @@ class RetinotopicMappingTrial(object):
 
         return trialDict
 
-    def generatePosOverlay(self):
+    def generatePosOverlay(self, cmap='hsv'):
 
         if (not hasattr(self, 'altPosMapf')) or (not hasattr(self, 'aziPosMapf')):
-            self._getSignMap()
+            self._getSignMap(cmap=cmap)
 
         vasMap = self.vasculatureMap
         altPosMap = self.altPosMapf
@@ -1705,13 +1705,13 @@ class RetinotopicMappingTrial(object):
         ax2.axis('off')
         ax2.set_title('azimuth position')
 
-    def generateNormalizedMaps(self, centerPatchKey='patch01', mapSize=512, isPlot=False, borderValue=0.):
+    def generateNormalizedMaps(self, centerPatchKey='patch01', mapSize=512, isPlot=False, borderValue=0., cmap='hsv'):
 
         if not hasattr(self, 'finalPatches'):
             self.processTrial()
 
         if not hasattr(self, 'signMap') or not hasattr(self, 'altPosMapf') or not hasattr(self, 'aziPosMapf'):
-            self._getSignMap()
+            self._getSignMap(cmap=cmap)
 
         centerPixel, rotationAngle = self.getNormalizeTransform(centerPatchKey=centerPatchKey)
 
@@ -1750,13 +1750,13 @@ class RetinotopicMappingTrial(object):
             f = plt.figure(figsize=(15, 8))
             f.suptitle('normalized maps for' + trialName)
             f_231 = f.add_subplot(231)
-            currfig = f_231.imshow(altPosMapNor, vmin=-30, vmax=50, cmap='hsv', interpolation='nearest')
+            currfig = f_231.imshow(altPosMapNor, vmin=-30, vmax=50, cmap=cmap, interpolation='nearest')
             f.colorbar(currfig)
             f_231.set_axis_off()
             f_231.set_title('normalized altitude position')
 
             f_232 = f.add_subplot(232)
-            currfig = f_232.imshow(aziPosMapNor, vmin=0, vmax=120, cmap='hsv', interpolation='nearest')
+            currfig = f_232.imshow(aziPosMapNor, vmin=0, vmax=120, cmap=cmap, interpolation='nearest')
             f.colorbar(currfig)
             f_232.set_axis_off()
             f_232.set_title('normalized altitude position')
@@ -1781,7 +1781,7 @@ class RetinotopicMappingTrial(object):
 
         return altPosMapNor, aziPosMapNor, altPowerMapNor, aziPowerMapNor, signMapNor, signMapfNor
 
-    def getNormalizeTransform(self, centerPatchKey='patch01'):
+    def getNormalizeTransform(self, centerPatchKey='patch01', cmap='hsv'):
 
         try:
             centerPatchObj = self.finalPatchesMarked[centerPatchKey]
@@ -1790,7 +1790,7 @@ class RetinotopicMappingTrial(object):
 
         centerPixel = centerPatchObj.getCenter()
 
-        if not hasattr(self, 'aziPosMapf'): self._getSignMap()
+        if not hasattr(self, 'aziPosMapf'): self._getSignMap(cmap=cmap)
 
         aziGradMap = np.gradient(self.aziPosMapf)
         aziGradMapX = np.sum(aziGradMap[0] * centerPatchObj.array)
@@ -1799,7 +1799,7 @@ class RetinotopicMappingTrial(object):
 
         return centerPixel, rotationAngle
 
-    def normalize(self, centerPatchKey='patch01', mapSize=800, isPlot=False, borderValue=0.):
+    def normalize(self, centerPatchKey='patch01', mapSize=800, isPlot=False, borderValue=0., cmap='hsv'):
 
         """
         Generate normalized vasculature map and normalized final patches
@@ -1816,7 +1816,7 @@ class RetinotopicMappingTrial(object):
             patches = self.finalPatches
 
         if not hasattr(self, 'signMap'):
-            self._getSignMap()
+            self._getSignMap(cmap=cmap)
 
         centerPixel, rotationAngle = self.getNormalizeTransform(centerPatchKey=centerPatchKey)
 
@@ -1871,7 +1871,7 @@ class RetinotopicMappingTrial(object):
         return vasMapNor, patchesNor
 
     def plotNormalizedPatchCenter(self, centerPatchKey='patch01', mapSize=512, plotAxis=None, markerSize=5.,
-                                  markerEdgeWidth=2.):
+                                  markerEdgeWidth=2., cmap='hsv'):
 
         if not plotAxis:
             f = plt.figure()
@@ -1881,7 +1881,7 @@ class RetinotopicMappingTrial(object):
             self.processTrial()
 
         if (not hasattr(self, 'signMap')) or (not hasattr(self, 'aziPosMapf')):
-            self._getSignMap()
+            self._getSignMap(cmap=cmap)
 
         centerPatchObj = self.finalPatches[centerPatchKey]
 
@@ -1927,7 +1927,7 @@ class RetinotopicMappingTrial(object):
         plotAxis.set_ylim([0, mapSize])
         plotAxis.set_axis_off()
 
-    def plotTrial(self, isSave=False, saveFolder=None):
+    def plotTrial(self, isSave=False, saveFolder=None, cmap='hsv'):
 
         if not hasattr(self, 'finalPatches'):
             self.processTrial()
@@ -1946,12 +1946,12 @@ class RetinotopicMappingTrial(object):
         f1 = plt.figure(figsize=(18, 9))
         f1.suptitle(trialName)
         f1_231 = f1.add_subplot(231)
-        currfig = f1_231.imshow(self.altPosMapf, vmin=self.params['lmin_alt'], vmax=self.params['lmax_alt'], cmap='hsv', interpolation='nearest')
+        currfig = f1_231.imshow(self.altPosMapf, vmin=self.params['lmin_alt'], vmax=self.params['lmax_alt'], cmap=cmap, interpolation='nearest')
         f1.colorbar(currfig)
         f1_231.set_axis_off()
         f1_231.set_title('alt position')
         f1_232 = f1.add_subplot(232)
-        currfig = f1_232.imshow(self.aziPosMapf, vmin=self.params['lmin_azi'], vmax=self.params['lmax_azi'], cmap='hsv', interpolation='nearest')
+        currfig = f1_232.imshow(self.aziPosMapf, vmin=self.params['lmin_azi'], vmax=self.params['lmax_azi'], cmap=cmap, interpolation='nearest')
         f1.colorbar(currfig)
         f1_232.set_axis_off()
         f1_232.set_title('azi position')
@@ -2142,7 +2142,8 @@ class RetinotopicMappingTrial(object):
             im.set_interpolation(interpolation)
             if plotName:
                 center = patch.getCenter()
-                plotAxis.text(center[1] * zoom, center[0] * zoom, key, verticalalignment='center',
+                abbrev_key = key.split('patch')[-1]
+                plotAxis.text(center[1] * zoom, center[0] * zoom, abbrev_key, verticalalignment='center',
                               horizontalalignment='center', color=plotColor, fontsize=fontSize)
 
         plotAxis.set_axis_off()
@@ -2297,7 +2298,7 @@ class RetinotopicMappingTrial(object):
 
         return baselineDict
 
-    def getMeanPowerAmplitude(self):
+    def getMeanPowerAmplitude(self, cmap='hsv'):
         """
         get mean response power amplitude of each visual area
         """
@@ -2310,7 +2311,7 @@ class RetinotopicMappingTrial(object):
         try:
             powerMap = ia.array_nor(np.mean([self.altPowerMapf, self.aziPowerMapf], axis=0))
         except AttributeError:
-            _ = self._getSignMap()
+            _ = self._getSignMap(cmap=cmap)
             powerMap = ia.array_nor(np.mean([self.altPowerMapf, self.aziPowerMapf], axis=0))
 
         # get V1 mean fluorscence
@@ -2398,7 +2399,7 @@ class RetinotopicMappingTrial(object):
 
         return magDict
 
-    def getVisualFieldOrigin(self):
+    def getVisualFieldOrigin(self, cmap='hsv'):
         """
         get the visual field origin as the retinotopic coordinates at the pixels
         where V1, LM and RL meet.
@@ -2411,7 +2412,7 @@ class RetinotopicMappingTrial(object):
             raise LookupError, 'Please mark the final patches first!!'
 
         if not hasattr(self, 'altPosMapf'):
-            _ = self._getSignMap()
+            _ = self._getSignMap(cmap=cmap)
 
         try:
             V1 = self.finalPatchesMarked['V1'].array.astype(np.float)
@@ -2596,15 +2597,16 @@ class RetinotopicMappingTrial(object):
 
     def plotContours(self, isNormalize=True, altLevels=np.arange(-30., 50., 5.), aziLevels=np.arange(0., 120., 5.),
                      isPlottingBorder=True, inline=False, lineWidth=3, figSize=(12, 12), fontSize=15, altAxis=None,
-                     aziAxis=None):
+                     aziAxis=None, cmap='hsv', contourInterval=5.0):
         """
         plot contours of altitute posititon and azimuth position
 
         isNormalize: is resetting the origin of visual field
         """
-
+        altLevels = np.arange(self.params['lmin_alt'], self.params['lmax_alt'], contourInterval)
+        aziLevels = np.arange(self.params['lmin_azi'], self.params['lmax_azi'], contourInterval)
         if not hasattr(self, 'altPosMapf'):
-            self._getSignMap()
+            self._getSignMap(cmap=cmap)
 
         altPosMap = self.altPosMapf
         aziPosMap = self.aziPosMapf
@@ -2639,7 +2641,8 @@ class RetinotopicMappingTrial(object):
                                      altPosMap,
                                      inline=inline,
                                      levels=altLevels,
-                                     linewidths=lineWidth)
+                                     linewidths=lineWidth,
+                                     cmap=cmap)
 
         if inline:
             altContour.clabel(inline=inline, fontsize=fontSize, fmt='%1.1f')
@@ -2666,7 +2669,8 @@ class RetinotopicMappingTrial(object):
                                      aziPosMap,
                                      inline=inline,
                                      levels=aziLevels,
-                                     linewidths=lineWidth)
+                                     linewidths=lineWidth,
+                                     cmap=cmap)
         if inline:
             aziContour.clabel(inline=1, fontsize=fontSize, fmt='%1.1f')
         else:
