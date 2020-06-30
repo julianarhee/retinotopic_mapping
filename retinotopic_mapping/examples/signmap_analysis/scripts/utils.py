@@ -25,6 +25,43 @@ def save_params(params, data_id='DATAID', dst_dir='/tmp'):
     print("saved params:\n  %s" % params_fpath)
 
 
+def create_params(verbose=False, **kwargs):
+
+    params = {'phaseMapFilterSigma': 1.,
+            'signMapFilterSigma': 9.,
+            'signMapThr': 0.3,
+            'eccMapFilterSigma': 15.0,
+            'splitLocalMinCutStep': 10.,
+            'closeIter': 3,
+            'openIter': 3,
+            'dilationIter': 15,
+            'borderWidth': 1,
+            'smallPatchThr': 400, #100,
+            'visualSpacePixelSize': 0.5,
+            'visualSpaceCloseIter': 15,
+            'splitOverlapThr': 1.1,
+            'mergeOverlapThr': 0.1,
+            
+            # Screen info
+            'lmin_alt': -58.5, #lmin_azi, #alt, #-33.66
+            'lmax_alt': 58.5, #lmax_azi, #alt, # 33.66
+            'lmin_azi': -58.5, #lmin_azi,
+            'lmax_azi': 58.5, #lmax_azi,
+
+            # Preprocessing
+            'mag_thr': 0.02, # mag_thr,
+            'smooth_fwhm': 7.0 #smooth_fwhm
+            }
+
+    print("updating params")
+    for k, v in kwargs.items():
+        if verbose:
+            print(k,v)
+        params.update({k: v})
+    
+    return params
+
+
 # Screen remapping
 def get_widefield_dims():
     return (117.0, 67.0)
