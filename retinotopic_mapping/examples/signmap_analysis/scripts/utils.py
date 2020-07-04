@@ -16,6 +16,33 @@ import matplotlib.pyplot as plt
 from scipy import misc, interpolate, stats, signal
 
 
+# Label final patches
+def assign_patch_name(trial, plot=True):
+    if plot:
+        trial.plotFinalPatchBorders(borderWidth=2, fontSize=20)
+        plt.show()
+         
+    selected_patches = raw_input('List patches (comma-sep, no spaces): ')
+    patch_ids = ['patch%02d' % int(s) for s in selected_patches.split(',')]
+    names = []
+    for patch in patch_ids:
+        patch_name = raw_input('%s, name = ' % patch)
+        names.append([patch, patch_name])
+    print("Labeled patches:\n  %s" % str(names))
+
+    finalPatchesMarked = dict(trial.finalPatches)
+
+    for i, namePair in enumerate(names):
+        currPatch = finalPatchesMarked.pop(namePair[0])
+        newPatchDict = {namePair[1]:currPatch}
+        finalPatchesMarked.update(newPatchDict)
+        
+    trial.finalPatchesMarked = finalPatchesMarked
+
+    return trial
+
+
+
 # Data saving
 def save_params(params, data_id='DATAID', dst_dir='/tmp'):
     params_fpath = os.path.join(dst_dir, '%s_params.json' % data_id)
