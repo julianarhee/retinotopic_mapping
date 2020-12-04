@@ -18,6 +18,7 @@ from tools import FileTools as ft
 from tools import ImageAnalysis as ia
 from tools import PlottingTools as pt
 
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 def loadTrial(trialPath):
     """
@@ -2597,7 +2598,7 @@ class RetinotopicMappingTrial(object):
 
     def plotContours(self, isNormalize=True, altLevels=np.arange(-30., 50., 5.), aziLevels=np.arange(0., 120., 5.),
                      isPlottingBorder=True, inline=False, lineWidth=3, figSize=(12, 12), fontSize=15, altAxis=None,
-                     aziAxis=None, cmap='hsv', contourInterval=5.0):
+                     aziAxis=None, cmap='hsv', contourInterval=5.0, borderWidth=2):
         """
         plot contours of altitute posititon and azimuth position
 
@@ -2647,14 +2648,18 @@ class RetinotopicMappingTrial(object):
         if inline:
             altContour.clabel(inline=inline, fontsize=fontSize, fmt='%1.1f')
         else:
-            altAxis.get_figure().colorbar(altContour)
+            #altAxis.get_figure().colorbar(altContour)
+            divider = make_axes_locatable(altAxis) #ax)
+            cax = divider.append_axes("right", size="5%", pad=0.05)
+            altAxis.get_figure().colorbar(altContour, cax=cax)
+
 
         if isPlottingBorder:
             self.plotFinalPatchBorders(plotAxis=altAxis,
                                        plotName=False,
                                        isTitle=False,
                                        isColor=False,
-                                       borderWidth=lineWidth,
+                                       borderWidth=borderWidth,
                                        interpolation='bilinear')
 
         altAxis.set_title('Altitute Positions')
@@ -2674,14 +2679,18 @@ class RetinotopicMappingTrial(object):
         if inline:
             aziContour.clabel(inline=1, fontsize=fontSize, fmt='%1.1f')
         else:
-            aziAxis.get_figure().colorbar(aziContour)
+            #aziAxis.get_figure().colorbar(aziContour)
+            divider = make_axes_locatable(aziAxis) #ax)
+            cax = divider.append_axes("right", size="5%", pad=0.05)
+            aziAxis.get_figure().colorbar(aziContour, cax=cax)
+
 
         if isPlottingBorder:
             self.plotFinalPatchBorders(plotAxis=aziAxis,
                                        plotName=False,
                                        isTitle=False,
                                        isColor=False,
-                                       borderWidth=lineWidth,
+                                       borderWidth=borderWidth,
                                        interpolation='bilinear')
 
         aziAxis.set_title('Azimuth Positions')
